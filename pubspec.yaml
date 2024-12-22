@@ -1,0 +1,40 @@
+name: arcgis
+description: "A new Flutter project."
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  get: ^4.6.6
+  google_maps_flutter: ^2.10.0
+  logger: ^2.5.0
+  path: ^1.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - lib\india_ds.shp
+    - lib\india_ds.dbf
+    - lib\cb_2018_us_aiannh_500k.shp
+    - lib\cb_2018_us_aiannh_500k.dbf
+    - lib\cb_2018_us_state_500k.shp
+    - lib\cb_2018_us_state_500k.dbf
+    - lib\cb_2018_us_necta_500k.shp
+    - lib\cb_2018_us_necta_500k.dbf
+    - lib\ne_110m_admin_1_states_provinces.shp
+    - lib\ne_110m_admin_1_states_provinces.dbf
+    - lib\tl_2024_04001_areawater.shp
+    - lib\tl_2024_04001_areawater.dbf
+    - lib\tl_2024_us_aiannh.dbf
+    - lib\tl_2024_us_aiannh.shp
+    - lib\tl_2024_50_sdadm.dbf
+    - lib\tl_2024_50_sdadm.shp
