@@ -1,17 +1,21 @@
-# Flutter ShapeFile Plotter
-A Flutter application that reads and plots `shapefiles` on a map using the flutter_map package.
+# **Flutter ShapeFile Plotter**  
+A Flutter app that reads and plots `shapefiles` on a map using the `flutter_map` package.  
 
-## Overview
-This project is designed to parse shapefiles (which are binary files) and convert them into a format that can be rendered on a map. Since flutter_map and similar packages do not support shapefiles directly, this app acts as an intermediate layer to read, process, and visualize geographic data.
+## **Overview**  
+This project parses binary shapefiles (`.shp` and `.dbf`) and converts them into a format compatible with `flutter_map`, enabling dynamic visualization of geographic data.  
 
-## Features
-- Read and parse shapefiles (.shp)
-- Convert shapefile data into a format compatible with flutter_map
-- Render geographic data dynamically on an interactive map
-- Acts as a foundation for a larger project aimed at developing a Dart package for shapefile-to-GeoJSON conversion
+## **Features**  
+- Users can select a `.shp` file, and the corresponding `.dbf` file is automatically loaded.  
+- Displays geographic features with attributes (visible on click).  
+- Converts shapefile data into a renderable format.
 
-## Future Scope
-- This project serves as a stepping stone towards building a Dart package that can:
-- Convert shapefiles to GeoJSON or other widely used geospatial formats
-- Provide an efficient API for handling shapefiles in Flutter apps
-- Offer compatibility with multiple map-rendering libraries
+## Working Images
+![India](lib/images/india.jpg)
+![India Attributes](lib/images/india_att.jpg)
+![Road](lib/images/road.jpg)
+![Road Attributes](lib/images//road_att.jpg)
+
+## **Future Scope**  
+- Develop a Dart package to convert shapefiles to GeoJSON or other formats.  
+- Provide an efficient API for handling shapefiles in Flutter apps.  
+- Enhance compatibility with multiple map-rendering libraries.  
