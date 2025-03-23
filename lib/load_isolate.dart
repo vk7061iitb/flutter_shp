@@ -25,12 +25,14 @@ Future<Map<String, dynamic>> loadNreadeData(
   double yMin = data.getFloat64(44, Endian.little);
   double xMax = data.getFloat64(52, Endian.little);
   double yMax = data.getFloat64(60, Endian.little);
-
+  if (xMin >= xMax || yMin >= yMax) {
+    throw 'Invalid bounds values!';
+  }
+  log.i("s: $yMin, $xMin ||  n: $yMax, $xMax");
   LatLngBounds bounds = LatLngBounds(
     southwest: LatLng(yMin, xMin),
     northeast: LatLng(yMax, xMax),
   );
-  List<LatLngBounds> geometryBounds = [];
   Set<Polygon> tempPolygon = {};
   Set<Polyline> tempPolyline = {};
   final DBFParser dbfParser = DBFParser();
@@ -42,14 +44,6 @@ Future<Map<String, dynamic>> loadNreadeData(
     int contentLength = data.getInt32(offset + 4, Endian.big);
     int shapeType = data.getInt32(offset + 8, Endian.little);
     int recordSizeInBytes = contentLength * 2;
-    double xMin = data.getFloat64(offset + 12, Endian.little);
-    double yMin = data.getFloat64(offset + 20, Endian.little);
-    double xMax = data.getFloat64(offset + 28, Endian.little);
-    double yMax = data.getFloat64(offset + 36, Endian.little);
-    LatLngBounds box = LatLngBounds(
-      southwest: LatLng(yMin, xMin),
-      northeast: LatLng(yMax, xMax),
-    );
 
     /// If polyline
     if (shapeType == 3) {
@@ -75,10 +69,54 @@ Future<Map<String, dynamic>> loadNreadeData(
           polylineId: PolylineId("$offset"),
           points: points,
           width: 2,
-          color: Colors.black,
+          color: Colors.red,
+          consumeTapEvents: true,
+          onTap: () {
+            Get.bottomSheet(
+              PopScope(
+                canPop: true,
+                onPopInvokedWithResult: (didPop, result) {},
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.white,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children:
+                            records[recordNumber - 1].entries.map((entry) {
+                          return ListBody(
+                            children: [
+                              Text(
+                                entry.key.toString(),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                entry.value.toString(),
+                                overflow: TextOverflow.fade,
+                                softWrap: true,
+                              ),
+                              const Divider(
+                                color: Colors.black26,
+                              ),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       );
-      geometryBounds.add(box);
     }
 
     /// If polygon
@@ -138,57 +176,58 @@ Future<Map<String, dynamic>> loadNreadeData(
           }
         }
       }
-      // add the polylines
+      // add the polgons
       for (int i = 0; i < exterior.length; i++) {
         tempPolygon.add(
           Polygon(
-              polygonId: PolygonId("polygon$i$offset"),
-              points: exterior[i],
-              holes: holesData[i] ?? const <List<LatLng>>[],
-              fillColor: Colors.red.shade200,
-              strokeColor: Colors.red,
-              strokeWidth: 2,
-              consumeTapEvents: true,
-              onTap: () {
-                Get.bottomSheet(
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: Colors.white,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children:
-                              records[recordNumber - 1].entries.map((entry) {
-                            return ListBody(
-                              children: [
-                                Text(
-                                  entry.key.toString(),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  entry.value.toString(),
-                                  overflow: TextOverflow.fade,
-                                  softWrap: true,
-                                ),
-                                const Divider(
-                                  color: Colors.black26,
-                                ),
-                              ],
-                            );
-                          }).toList(),
-                        ),
+            polygonId: PolygonId("$i$offset"),
+            points: exterior[i],
+            holes: holesData[i] ?? const <List<LatLng>>[],
+            fillColor: Colors.red.shade200,
+            strokeColor: Colors.red,
+            strokeWidth: 2,
+            consumeTapEvents: true,
+            onTap: () {
+              Get.bottomSheet(
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.white,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children:
+                            records[recordNumber - 1].entries.map((entry) {
+                          return ListBody(
+                            children: [
+                              Text(
+                                entry.key.toString(),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                entry.value.toString(),
+                                overflow: TextOverflow.fade,
+                                softWrap: true,
+                              ),
+                              const Divider(
+                                color: Colors.black26,
+                              ),
+                            ],
+                          );
+                        }).toList(),
                       ),
                     ),
                   ),
-                );
-              }),
+                ),
+              );
+            },
+          ),
         );
       }
     }

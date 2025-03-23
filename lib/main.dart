@@ -1,9 +1,10 @@
-import 'package:arcgis/map.dart';
+import 'package:arcgis/map_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const MainApp());
 }
 
@@ -11,15 +12,20 @@ class MainApp extends StatefulWidget {
   const MainApp({super.key});
 
   @override
-  State<MainApp> createState() => _MainAppState();
+  MainAppState createState() => MainAppState();
 }
 
-class _MainAppState extends State<MainApp> {
+class MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
-    return const GetMaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MapPage(),
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('GIS App'),
+        ),
+        body: const MapPage2(),
+      ),
     );
   }
 }

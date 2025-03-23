@@ -9,8 +9,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_map: ^7.0.2
   get: ^4.6.6
   google_maps_flutter: ^2.10.0
+  latlong2: ^0.9.1
   logger: ^2.5.0
   path: ^1.9.0
 
@@ -34,7 +36,9 @@ flutter:
     - lib\ne_110m_admin_1_states_provinces.dbf
     - lib\tl_2024_04001_areawater.shp
     - lib\tl_2024_04001_areawater.dbf
-    - lib\tl_2024_us_aiannh.dbf
-    - lib\tl_2024_us_aiannh.shp
     - lib\tl_2024_50_sdadm.dbf
     - lib\tl_2024_50_sdadm.shp
+    - lib\tl_2024_55_prisecroads.dbf
+    - lib\tl_2024_55_prisecroads.shp
+    - lib\tl_2019_12061_roads.shp
+    - lib\tl_2019_12061_roads.dbf

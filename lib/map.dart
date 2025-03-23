@@ -10,46 +10,66 @@ class MapPage extends StatefulWidget {
   State<MapPage> createState() => _MapPageState();
 }
 
-int fileCode = 0;
-late GoogleMapController _mapController;
-Set<Polygon> polygon = {};
-Set<Polyline> polyline = {};
-Set<ClusterManager> clusterManager = {};
-Logger logger = Logger();
-LatLngBounds bounds =
-    LatLngBounds(southwest: const LatLng(0, 0), northeast: const LatLng(0, 0));
-
-String selectedFile = 'india_ds.shp'; // Default file
-List<String> fileList = [
-  'cb_2018_us_aiannh_500k.shp',
-  'tl_2024_us_aiannh.shp',
-  'cb_2018_us_state_500k.shp',
-  'cb_2018_us_necta_500k.shp',
-  'ne_110m_admin_1_states_provinces.shp',
-  'india_ds.shp',
-  'tl_2024_04001_areawater.shp',
-  'tl_2024_50_sdadm.shp'
-];
-
-Future<void> readNplot(String filename) async {
-  String dbfFilePath = filename.replaceAll('.shp', '.dbf');
-  try {
-    Map<String, dynamic> res =
-        await loadNreadeData('lib/$filename', 'lib/$dbfFilePath');
-    polygon = res['polygons'];
-    polyline = res['polylines'];
-    bounds = res['bounds'];
-
-    _mapController.animateCamera(
-      CameraUpdate.newLatLngBounds(bounds, 50),
-    );
-  } catch (e, s) {
-    logger.e("Error : $e");
-    logger.i("StackTrace: $s");
-  }
-}
-
 class _MapPageState extends State<MapPage> {
+  int fileCode = 0;
+  late GoogleMapController _mapController;
+  Set<Polygon> polygon = {};
+  Set<Polygon> polygontoshow = {};
+  Set<Polyline> polylinetoshow = {};
+  Set<Polyline> polyline = {};
+  Set<ClusterManager> clusterManager = {};
+  Logger logger = Logger();
+
+  LatLngBounds bounds = LatLngBounds(
+      southwest: const LatLng(0, 0), northeast: const LatLng(0, 0));
+
+  String selectedFile = 'india_ds.shp'; // Default file
+  List<String> fileList = [
+    'cb_2018_us_aiannh_500k.shp',
+    'tl_2024_us_aiannh.shp',
+    'cb_2018_us_state_500k.shp',
+    'cb_2018_us_necta_500k.shp',
+    'ne_110m_admin_1_states_provinces.shp',
+    'india_ds.shp',
+    'tl_2024_04001_areawater.shp',
+    'tl_2024_50_sdadm.shp',
+    'tl_2024_55_prisecroads.shp'
+  ];
+
+  Future<void> readNplot(String filename) async {
+    String dbfFilePath = filename.replaceAll('.shp', '.dbf');
+    try {
+      Map<String, dynamic> res =
+          await loadNreadeData('lib/$filename', 'lib/$dbfFilePath');
+      polygon = res['polygons'];
+      polygontoshow = res['polygons'];
+      polyline = res['polylines'];
+      polylinetoshow = res['polylines'];
+      bounds = res['bounds'];
+      logger.i("polyLen : ${polygon.length}");
+      _mapController.animateCamera(
+        CameraUpdate.newLatLngBounds(bounds, 50),
+      );
+    } catch (e, s) {
+      logger.e("Error : $e");
+      logger.i("StackTrace: $s");
+    }
+  }
+
+  void changeColor(PolygonId id, bool flag) {
+    for (Polygon p in polygon) {
+      if (p.polygonId == id) {
+        p = p.copyWith(
+          fillColorParam: Colors.yellow.shade200,
+          strokeColorParam: Colors.yellow,
+          strokeWidthParam: 4,
+        );
+        break;
+      }
+    }
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
@@ -109,18 +129,57 @@ class _MapPageState extends State<MapPage> {
                 ),
                 Expanded(
                   child: GoogleMap(
-                    initialCameraPosition: const CameraPosition(
-                      target: LatLng(0, 0),
-                    ),
-                    polygons: polygon,
-                    polylines: polyline,
-                    onMapCreated: (GoogleMapController controller) {
-                      _mapController = controller;
-                      _mapController.animateCamera(
-                        CameraUpdate.newLatLngBounds(bounds, 10),
-                      );
-                    },
-                  ),
+                      initialCameraPosition: const CameraPosition(
+                        target: LatLng(0, 0),
+                      ),
+                      polygons: polygontoshow,
+                      liteModeEnabled: false,
+                      polylines: polylinetoshow,
+                      buildingsEnabled: false,
+                      onMapCreated: (GoogleMapController controller) {
+                        _mapController = controller;
+                        _mapController.animateCamera(
+                          CameraUpdate.newLatLngBounds(bounds, 10),
+                        );
+                      },
+                      onCameraMove: (pos) {},
+                      onCameraMoveStarted: () {
+                        setState(() {});
+                      },
+                      onCameraIdle: () async {
+                        LatLngBounds b =
+                            await _mapController.getVisibleRegion();
+
+                        /// polyline handling
+                        // TO-DO : Also check whether the center of the polygon is inside the bound or not,
+                        Set<Polyline> newPolylinetoshow = {};
+                        for (var p in polyline) {
+                          for (LatLng point in p.points) {
+                            if (b.contains(point)) {
+                              newPolylinetoshow.add(p);
+                              break;
+                            }
+                          }
+                        }
+
+                        /// polygon handling
+                        logger.i("polygons(before) = ${polygontoshow.length}");
+
+                        Set<Polygon> newPolygonsToShow = {};
+                        for (Polygon p in polygon) {
+                          for (LatLng point in p.points) {
+                            if (b.contains(point)) {
+                              newPolygonsToShow.add(p);
+                              break;
+                            }
+                          }
+                        }
+                        setState(() {
+                          polygontoshow = newPolygonsToShow;
+                          polylinetoshow = newPolylinetoshow;
+                        });
+                        logger.i("polygons(after) = ${polygontoshow.length}");
+                      }),
                 ),
               ],
             ),
