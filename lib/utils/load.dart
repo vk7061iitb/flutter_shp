@@ -1,14 +1,14 @@
 import 'dart:typed_data';
-import 'package:arcgis/dbf_reader.dart';
-import 'package:arcgis/models/shp_data.dart';
+import 'package:arcgis/utils/data.dart';
+import 'package:arcgis/utils/dbf_reader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:logger/logger.dart';
 
 Logger log = Logger();
-Future<Map<String, dynamic>> loadNreadeData(
+Future<Map<String, dynamic>> loadData(
     String filepath, String dbfFilePath) async {
   ByteData data = await rootBundle.load(filepath);
   Uint8List shpByteData = data.buffer.asUint8List();
@@ -28,13 +28,13 @@ Future<Map<String, dynamic>> loadNreadeData(
   if (xMin >= xMax || yMin >= yMax) {
     throw 'Invalid bounds values!';
   }
-  log.i("s: $yMin, $xMin ||  n: $yMax, $xMax");
+
   LatLngBounds bounds = LatLngBounds(
-    southwest: LatLng(yMin, xMin),
-    northeast: LatLng(yMax, xMax),
+    LatLng(yMin, xMin),
+    LatLng(yMax, xMax),
   );
-  Set<Polygon> tempPolygon = {};
-  Set<Polyline> tempPolyline = {};
+  List<Polygon> tempPolygon = [];
+  List<Polyline> tempPolyline = [];
   final DBFParser dbfParser = DBFParser();
   final header = await dbfParser.parseHeader(dbfFilePath);
   final records = await dbfParser.parseRecords(dbfFilePath, header);
@@ -66,55 +66,10 @@ Future<Map<String, dynamic>> loadNreadeData(
       }
       tempPolyline.add(
         Polyline(
-          polylineId: PolylineId("$offset"),
           points: points,
-          width: 2,
+          strokeWidth: 3,
           color: Colors.red,
-          consumeTapEvents: true,
-          onTap: () {
-            Get.bottomSheet(
-              PopScope(
-                canPop: true,
-                onPopInvokedWithResult: (didPop, result) {},
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Colors.white,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children:
-                            records[recordNumber - 1].entries.map((entry) {
-                          return ListBody(
-                            children: [
-                              Text(
-                                entry.key.toString(),
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                entry.value.toString(),
-                                overflow: TextOverflow.fade,
-                                softWrap: true,
-                              ),
-                              const Divider(
-                                color: Colors.black26,
-                              ),
-                            ],
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
+          hitValue: HitValue.from(records[recordNumber - 1]),
         ),
       );
     }
@@ -180,53 +135,14 @@ Future<Map<String, dynamic>> loadNreadeData(
       for (int i = 0; i < exterior.length; i++) {
         tempPolygon.add(
           Polygon(
-            polygonId: PolygonId("$i$offset"),
             points: exterior[i],
-            holes: holesData[i] ?? const <List<LatLng>>[],
-            fillColor: Colors.red.shade200,
-            strokeColor: Colors.red,
-            strokeWidth: 2,
-            consumeTapEvents: true,
-            onTap: () {
-              Get.bottomSheet(
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Colors.white,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children:
-                            records[recordNumber - 1].entries.map((entry) {
-                          return ListBody(
-                            children: [
-                              Text(
-                                entry.key.toString(),
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                entry.value.toString(),
-                                overflow: TextOverflow.fade,
-                                softWrap: true,
-                              ),
-                              const Divider(
-                                color: Colors.black26,
-                              ),
-                            ],
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
+            holePointsList: holesData[i] ?? const <List<LatLng>>[],
+            borderColor: Colors.red,
+            // ignore: deprecated_member_use
+            color: Colors.red.withOpacity(0.25),
+            borderStrokeWidth: 3,
+            disableHolesBorder: false,
+            hitValue: HitValue.from(records[recordNumber - 1]),
           ),
         );
       }
@@ -341,49 +257,4 @@ int findPolygonOrientation(List<LatLng> points) {
   } else {
     return 0; // degenerate
   }
-}
-
-/// [TO DO]
-PolyLine getPolylineData({
-  required int shpOffset,
-  required ByteData shpData,
-}) {
-  double xMin = shpData.getFloat64(shpOffset + 12, Endian.little);
-  double yMin = shpData.getFloat64(shpOffset + 20, Endian.little);
-  double xMax = shpData.getFloat64(shpOffset + 28, Endian.little);
-  double yMax = shpData.getFloat64(shpOffset + 36, Endian.little);
-  LatLngBounds box = LatLngBounds(
-    southwest: LatLng(yMin, xMin),
-    northeast: LatLng(yMax, xMax),
-  );
-  int m = shpData.getInt32(shpOffset + 44, Endian.little); // no. of parts
-  int n = shpData.getInt32(shpOffset + 48, Endian.little); // no. of points
-  List<int> parts = List.filled(m, 0, growable: false);
-
-  for (int i = 0; i < m; i++) {
-    int byteOffset = shpOffset + 52 + i * 4;
-    parts[i] = shpData.getInt32(byteOffset, Endian.little);
-  }
-
-  int pointsOffset = shpOffset + 52 + m * 4;
-  List<LatLng> points = List.filled(n, const LatLng(0, 0));
-
-  for (int i = 0; i < n; i++) {
-    int lngOffset = pointsOffset + (i * 16); // x
-    int latOffset = pointsOffset + (i * 16) + 8; // y
-    points[i] = LatLng(
-      shpData.getFloat64(latOffset, Endian.little), // latitude
-      shpData.getFloat64(lngOffset, Endian.little), // longitude
-    );
-  }
-  // calculate attributes
-
-  return PolyLine(
-    box: box,
-    numParts: m,
-    numPoints: n,
-    parts: parts,
-    points: points,
-    attributes: {"name": "polyline"},
-  );
 }

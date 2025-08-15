@@ -24,21 +24,24 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - lib\india_ds.shp
-    - lib\india_ds.dbf
-    - lib\cb_2018_us_aiannh_500k.shp
-    - lib\cb_2018_us_aiannh_500k.dbf
-    - lib\cb_2018_us_state_500k.shp
-    - lib\cb_2018_us_state_500k.dbf
-    - lib\cb_2018_us_necta_500k.shp
-    - lib\cb_2018_us_necta_500k.dbf
-    - lib\ne_110m_admin_1_states_provinces.shp
-    - lib\ne_110m_admin_1_states_provinces.dbf
-    - lib\tl_2024_04001_areawater.shp
-    - lib\tl_2024_04001_areawater.dbf
-    - lib\tl_2024_50_sdadm.dbf
-    - lib\tl_2024_50_sdadm.shp
-    - lib\tl_2024_55_prisecroads.dbf
-    - lib\tl_2024_55_prisecroads.shp
-    - lib\tl_2019_12061_roads.shp
-    - lib\tl_2019_12061_roads.dbf
+    - lib/assets/shapefiles/cb_2018_us_aiannh_500k.dbf
+    - lib/assets/shapefiles/cb_2018_us_aiannh_500k.shp
+    - lib/assets/shapefiles/cb_2018_us_necta_500k.dbf
+    - lib/assets/shapefiles/cb_2018_us_necta_500k.shp
+    - lib/assets/shapefiles/cb_2018_us_state_500k.dbf
+    - lib/assets/shapefiles/cb_2018_us_state_500k.shp
+    - lib/assets/shapefiles/india_ds.dbf
+    - lib/assets/shapefiles/india_ds.shp
+    - lib/assets/shapefiles/ne_10m_ocean.shp
+    - lib/assets/shapefiles/ne_110m_admin_1_states_provinces.dbf
+    - lib/assets/shapefiles/ne_110m_admin_1_states_provinces.shp
+    - lib/assets/shapefiles/road_drrp.dbf
+    - lib/assets/shapefiles/road_drrp.shp
+    - lib/assets/shapefiles/tl_2019_12061_roads.dbf
+    - lib/assets/shapefiles/tl_2019_12061_roads.shp
+    - lib/assets/shapefiles/tl_2024_04001_areawater.dbf
+    - lib/assets/shapefiles/tl_2024_04001_areawater.shp
+    - lib/assets/shapefiles/tl_2024_50_sdadm.dbf
+    - lib/assets/shapefiles/tl_2024_50_sdadm.shp
+    - lib/assets/shapefiles/tl_2024_55_prisecroads.dbf
+    - lib/assets/shapefiles/tl_2024_55_prisecroads.shp
