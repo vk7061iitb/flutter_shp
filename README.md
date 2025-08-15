@@ -105,19 +105,23 @@ lib/
 ## 🖼️ **Screenshots & Demo**
 
 ### 📱 **India Districts View**
-![India Districts](images/india.png)
+<img src="images/india.png"  width="50%">
+
 *Interactive view of Indian administrative districts with smooth rendering*
 
 ### 📊 **Attribute Inspector** 
-![India Attributes](images/india_att.png)
+<img src="images/india_att.png"  width="50%">
+
 *Detailed feature attributes displayed in an elegant modal interface*
 
 ### 🛣️ **Road Networks**
-![Road Network](images/road.png)
+<img src="images/road.png"  width="50%">
+
 *Complex polyline rendering of transportation infrastructure*
 
 ### 🔍 **Road Details**
-![Road Attributes](images/road_att.png)
+<img src="images/road_att.png"  width="50%">
+
 *Comprehensive road feature information with coordinate display*
 
 ## 🚀 **Future Roadmap**
