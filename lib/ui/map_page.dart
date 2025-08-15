@@ -64,8 +64,9 @@ class _MapPage2State extends State<MapPage2> with TickerProviderStateMixin {
       // Add haptic feedback
       HapticFeedback.selectionClick();
 
-      Map<String, dynamic> res =
-          await loadData('lib/assets/shapefiles/$filename', 'lib/assets/shapefiles/$dbfFilePath');
+      Map<String, dynamic> res = await loadData(
+          'lib/assets/shapefiles/$filename',
+          'lib/assets/shapefiles/$dbfFilePath');
       polygontoshow = res['polygons'];
       polylinetoshow = res['polylines'];
       bounds = res['bounds'];
@@ -584,31 +585,35 @@ class _MapPage2State extends State<MapPage2> with TickerProviderStateMixin {
                 ),
               ),
               // Header
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline, color: Colors.blue),
-                    const SizedBox(width: 8),
-                    const Text(
+                    Icon(Icons.info_outline, color: Colors.blue),
+                    SizedBox(width: 8),
+                    Text(
                       'Feature Attributes',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      'Lat: ${coords.latitude.toStringAsFixed(4)}, '
-                      'Lng: ${coords.longitude.toStringAsFixed(4)}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Lat: ${coords.latitude.toStringAsFixed(4)}, '
+                  'Lng: ${coords.longitude.toStringAsFixed(4)}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ),
+
               const Divider(),
               // Content
               Expanded(
